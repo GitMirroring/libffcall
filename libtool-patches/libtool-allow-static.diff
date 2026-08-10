@@ -24,8 +24,8 @@ index 0f0a2da..1d0185a 100644
  	build_old_libs=no
  	break
  	;;
--      -all-static | -static | -static-libtool-libs)
-+      -all-static | -static | -static-uninstalled-libs | -static-libtool-libs)
+-      -all-static | -static | -static-libtool-libs | --static | -Bstatic)
++      -all-static | -static | -static-uninstalled-libs | -static-libtool-libs | --static | -Bstatic)
  	case $arg in
 -	-all-static)
 +	-all-static | -static)
