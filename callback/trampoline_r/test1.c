@@ -1,7 +1,7 @@
 /* Trampoline test */
 
 /*
- * Copyright 1995-2023 Bruno Haible <bruno@clisp.org>
+ * Copyright 1995-2026 Bruno Haible <bruno@clisp.org>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -67,7 +67,11 @@ register void* env __asm__("%r29");
 register void* env __asm__("%r31");
 #endif
 #ifdef __arm64__
+#if defined _WIN32 || (defined __APPLE__ && defined __MACH__) /* arm64-ms ABI */
+register void* env __asm__("x17");
+#else /* plain arm64 ABI */
 register void* env __asm__("x18");
+#endif
 #endif
 #ifdef __powerpc__
 register void* env __asm__("r11");

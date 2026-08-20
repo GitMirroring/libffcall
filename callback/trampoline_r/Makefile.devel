@@ -189,6 +189,9 @@ tramp-arm.o : tramp-arm.s
 tramp-arm64.o : tramp-arm64.s
 	$(CROSS_TOOL) aarch64-linux as tramp-arm64.s -o $@
 
+tramp-arm64-ms.o : tramp-arm64-ms.s
+	$(CROSS_TOOL) aarch64-linux as tramp-arm64-ms.s -o $@
+
 tramp-powerpc-old.o : tramp-powerpc-old.s
 	$(ASPREFIX)/rs6000/bin/as tramp-powerpc-old.s -o $@
 

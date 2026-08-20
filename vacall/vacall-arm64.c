@@ -1,7 +1,7 @@
 /* vacall function for arm64 (a.k.a. aarch64) CPU */
 
 /*
- * Copyright 1995-2021 Bruno Haible <bruno@clisp.org>
+ * Copyright 1995-2026 Bruno Haible <bruno@clisp.org>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,7 +22,12 @@
 #ifdef REENTRANT
 #define vacall_receiver callback_receiver
 register struct { void (*vacall_function) (void*,va_alist); void* arg; }
-         *              env     __asm__("x18");
+         *              env
+#if defined _WIN32 || (defined __APPLE__ && defined __MACH__) /* arm64-ms ABI */
+         __asm__("x17");
+#else /* plain arm64 ABI */
+         __asm__("x18");
+#endif
 #endif
 
 register __vaword* sret __asm__("x8");  /* structure return pointer */

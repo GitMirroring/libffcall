@@ -1,7 +1,7 @@
 /* Trampoline construction */
 
 /*
- * Copyright 1995-2025 Bruno Haible <bruno@clisp.org>
+ * Copyright 1995-2026 Bruno Haible <bruno@clisp.org>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -1234,6 +1234,32 @@ __TR_function alloc_trampoline_r (__TR_function address, void* data0, void* data
   ((long *) function)[10]
 #endif
 #ifdef __arm64__
+#if defined _WIN32 || (defined __APPLE__ && defined __MACH__) /* arm64-ms ABI */
+  /* function:
+   *    ldr x16,.+24            580000D0
+   *    ldr x17,.+12            58000071
+   *    br x16                  D61F0200
+   *    nop                     D503201F
+   *    .xword <data>           <data>
+   *    .xword <address>        <address>
+   */
+  *(int *)   (function + 0) = 0x580000D0;
+  *(int *)   (function + 4) = 0x58000071;
+  *(int *)   (function + 8) = 0xD61F0200;
+  *(int *)   (function +12) = 0xD503201F;
+  *(long *)  (function +16) = (unsigned long) data;
+  *(long *)  (function +24) = (unsigned long) address;
+#define TRAMP_CODE_LENGTH  16
+#define is_tramp(function)  \
+  *(unsigned int *) (function + 0) == 0x580000D0 && \
+  *(unsigned int *) (function + 4) == 0x58000071 && \
+  *(unsigned int *) (function + 8) == 0xD61F0200 && \
+  *(unsigned int *) (function +12) == 0xD503201F
+#define tramp_address(function)  \
+  (*(unsigned long *) (function +24))
+#define tramp_data(function)  \
+  (*(unsigned long *) (function +16))
+#else /* plain arm64 ABI */
   /* function:
    *    ldr x17,.+24            580000D1
    *    ldr x18,.+12            58000072
@@ -1258,6 +1284,7 @@ __TR_function alloc_trampoline_r (__TR_function address, void* data0, void* data
   (*(unsigned long *) (function +24))
 #define tramp_data(function)  \
   (*(unsigned long *) (function +16))
+#endif
 #endif
 #ifdef __powerpcsysv4__
   /* function:
